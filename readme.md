@@ -2,15 +2,13 @@
 
 #### Examples
 
-Level 1
-
+Level 1 only:
 ```
 $ ./main.py -l 1 sample.json 
  90.2 Mb - {root}
 ```
 
-Level 2
-
+Level 2 only:
 ```
 $ ./main.py -l 2 sample.json 
  90.2 Mb - {root}
@@ -44,4 +42,16 @@ $ ./main.py -l 2 sample.json
  46.0 b      - {root/costLimitInformation}
  90.0 Mb     - [root/carts]
   5.0 b      - 'root/buyerCurrency'
+```
+
+Level 3 with pattern:
+```
+$ ./main.py -l 3 -p root/totals sample.json 
+  6.0 Kb     - {root/totals}
+216.0 b          - [root/totals/conditionalPromos]
+  5.7 Kb         - [root/totals/promos]
+  1.0 b          - 'root/totals/servicesTotal'
+  3.0 b          - 'root/totals/buyerDeliveryTotal'
+  6.0 b          - 'root/totals/buyerTotal'
+  6.0 b          - 'root/totals/buyerItemsTotal'
 ```
