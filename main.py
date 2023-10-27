@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import json
 import re
@@ -18,7 +18,7 @@ q = {'dict': ['{', '}'], 'list': ['[', ']'], 'val': ["'", "'"]}
 def human_bytes(size):
     for x in ['b', 'Kb', 'Mb', 'Gb', 'Tb']:
         if size < 1024.0:
-            return "%3.0f %s" % (size, x)
+            return "%5.1f %s" % (size, x)
         size /= 1024.0
 
     return size
