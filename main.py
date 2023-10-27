@@ -62,7 +62,6 @@ def get_nested_size(item, storage, name, level=0):
 with open(config['filename'][0], 'r', encoding='utf-8') as f:
     data = json.load(f)
 
-pattern = False
 storage = []
 get_nested_size(data, storage, 'root')
 
