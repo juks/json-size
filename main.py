@@ -3,6 +3,9 @@
 import json
 import re
 import argparse
+import collections
+import time
+import os
 
 parser = argparse.ArgumentParser(description="Runtime parameters",
                                  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -13,7 +16,8 @@ parser.add_argument('-p', '--pattern',   help='base model to use', default=None)
 args = parser.parse_args()
 config = vars(args)
 q = {'dict': ['{', '}'], 'list': ['[', ']'], 'val': ["'", "'"]}
-
+size_map = collections.defaultdict(lambda: {'name': '', 'size': 0})
+common_speeds = [{'title': '100 Mbps', 'speed': 100}, {'title': '1 Gigabit', 'speed': 1000}, {'title': '10 Gigabit', 'speed': 10000}]
 
 def human_bytes(size):
     for x in ['b', 'Kb', 'Mb', 'Gb', 'Tb']:
@@ -56,16 +60,32 @@ def get_nested_size(item, storage, name, level=0):
 
         storage.append({'len': ll, 'level': level, 'name': name, 'type': 'val'})
 
+    if size_map[level]['size'] < ll:
+        size_map[level] = {'name': name, 'size': ll}
+
     return ll
 
 
 with open(config['filename'][0], 'r', encoding='utf-8') as f:
+    total_size = os.path.getsize(config['filename'][0])
+    time_before_parse = time.time()
     data = json.load(f)
+    time_after_parse = time.time()
 
 storage = []
 get_nested_size(data, storage, 'root')
 
+parse_time = time_after_parse - time_before_parse
+print("\nSource file size: %s" % human_bytes(total_size))
+print("JSON parse time: %3.1f sec\n" % (parse_time))
+print("Transfer times:")
+for speed in common_speeds:
+    print(" %s %3.1f sec" % (speed['title'], total_size / (speed['speed'] * 125000)))
+print()
+print("1 Gigabit transfer + parse time: %3.1f sec\n" % (parse_time + total_size / (common_speeds[1]['speed'] * 125000)))
+
 for line in reversed(storage):
     if line['level'] < config['max_level'] and (not config['pattern'] or re.search(config['pattern'], line['name'])):
         hl = human_bytes(line['len'])
-        print(hl + ' ' * (8 - len(hl)) + ' ' * (line['level'] * 4) + " - " + q[line['type']][0] + str(line['name']) + q[line['type']][1])
+        max_sign = '*' if line['name'] == size_map[line['level']]['name'] and line['level'] > 0 else ' '
+        print(max_sign + hl + ' ' * (8 - len(hl)) + ' ' * (line['level'] * 4) + " - " + q[line['type']][0] + str(line['name']) + q[line['type']][1])
