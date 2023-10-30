@@ -11,7 +11,7 @@ parser = argparse.ArgumentParser(description="Runtime parameters",
                                  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('filename', help='Source file', nargs='+')
 parser.add_argument("-l", "--max_level", help="max display level", default=10000, type=int)
-parser.add_argument('-p', '--pattern',   help='base model to use', default=None)
+parser.add_argument('-p', '--pattern',   help='show the pattern matching path only', default=None)
 
 args = parser.parse_args()
 config = vars(args)
